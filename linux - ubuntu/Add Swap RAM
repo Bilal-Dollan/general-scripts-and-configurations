@@ -1,0 +1,59 @@
+1️⃣ Check if swap already exists
+sudo swapon --show
+free -h
+
+
+If nothing is listed under swapon, you have no active swap.
+
+2️⃣ Create a swapfile (recommended for VPS and cloud servers)
+Choose swap size
+
+Example: allocate 4GB of swap.
+
+sudo fallocate -l 4G /swapfile
+
+
+If fallocate fails, use this instead:
+
+sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
+
+3️⃣ Secure the swapfile
+
+Very important for security → prevents other users from reading swap content.
+
+sudo chmod 600 /swapfile
+
+4️⃣ Convert the file into swap space
+sudo mkswap /swapfile
+
+5️⃣ Enable the swap
+sudo swapon /swapfile
+
+
+Check again:
+
+sudo swapon --show
+free -h
+
+6️⃣ Make the swap permanent (survives reboot)
+
+Edit /etc/fstab:
+
+sudo nano /etc/fstab
+
+
+Add the following line at the bottom:
+
+/swapfile swap swap defaults 0 0
+
+
+Save and exit.
+
+7️⃣ Optimize swap settings (optional but recommended)
+Lower swappiness (reduces swap usage, best for servers):
+echo "vm.swappiness=10" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+Reduce cache pressure:
+echo "vm.vfs_cache_pressure=50" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
